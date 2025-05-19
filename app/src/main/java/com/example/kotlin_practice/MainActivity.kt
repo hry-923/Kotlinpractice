@@ -46,21 +46,24 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
-    var message by remember { mutableStateOf("押せよ") }
-    var text by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf("押すなよ") }
+    var output  by remember { mutableStateOf("") }
+    var text    by remember { mutableStateOf("") }
 
     Column(modifier = modifier.padding(16.dp)) {
         Text(text = "こんにちは!", color = Color.Red)
 
         Button(
             onClick = { Log.d("Button", "onClick")
-                        message = "クリックされた！"
+                        message = "押すなって言ったやん"
+                        output  = "お前も韓国語を勉強しろ"
                       },
 
             modifier = Modifier.padding(top = 20.dp)
         ) {
             Text(message)
         }
+        Text(text = output, color = Color.Blue)
 
         TextField(
             value = text,
