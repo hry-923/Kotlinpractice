@@ -23,6 +23,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.foundation.layout.Column
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,16 +46,20 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
+    var message by remember { mutableStateOf("押せよ") }
     var text by remember { mutableStateOf("") }
 
     Column(modifier = modifier.padding(16.dp)) {
         Text(text = "こんにちは!", color = Color.Red)
 
         Button(
-            onClick = { Log.d("Button", "onClick") },
+            onClick = { Log.d("Button", "onClick")
+                        message = "クリックされた！"
+                      },
+
             modifier = Modifier.padding(top = 20.dp)
         ) {
-            Text(text = "押せよ")
+            Text(message)
         }
 
         TextField(
