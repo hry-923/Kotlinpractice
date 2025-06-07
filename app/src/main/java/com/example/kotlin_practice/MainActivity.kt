@@ -50,6 +50,10 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     var output  by remember { mutableStateOf("") }
     var text    by remember { mutableStateOf("") }
 
+    var heightText by remember { mutableStateOf("") }
+    var weightText by remember { mutableStateOf("") }
+    var bmiResult by remember { mutableStateOf("") }
+
     Column(modifier = modifier.padding(16.dp)) {
         Text(text = "こんにちは!", color = Color.Red)
 
@@ -67,15 +71,46 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 
         TextField(
             value = text,
-            onValueChange = { text = it }
+            onValueChange = { text = it },
+            label = { Text("自由入力") },
+            modifier = Modifier.padding(top = 20.dp)
         )
-    }
-}
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    KotlinpracticeTheme {
-        Greeting("Android")
+        // BMI計算用のUI
+        Text(text = "BMI計算", color = Color.Black, modifier = Modifier.padding(top = 30.dp))
+
+        TextField(
+            value = heightText,
+            onValueChange = { heightText = it },
+            label = { Text("身長 (cm)") },
+            modifier = Modifier.padding(top = 8.dp)
+        )
+
+        TextField(
+            value = weightText,
+            onValueChange = { weightText = it },
+            label = { Text("体重 (kg)") },
+            modifier = Modifier.padding(top = 8.dp)
+        )
+
+        Button(
+            onClick = {
+                val height = heightText.toFloatOrNull()
+                val weight = weightText.toFloatOrNull()
+
+                if (height != null && weight != null && height > 0) {
+                    val heightInMeters = height / 100
+                    val bmi = weight / (heightInMeters * heightInMeters)
+                    bmiResult = "あなたのBMIは %.2f です".format(bmi)
+                } else {
+                    bmiResult = "正しい数値を入力してください"
+                }
+            },
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            Text("BMIを計算する")
+        }
+
+        Text(text = bmiResult, color = Color.Magenta, modifier = Modifier.padding(top = 16.dp))
     }
 }
