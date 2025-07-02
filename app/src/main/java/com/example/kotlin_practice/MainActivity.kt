@@ -22,6 +22,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 
 
 class MainActivity : ComponentActivity() {
@@ -30,19 +34,42 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             KotlinpracticeTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-
-                    )
-                }
+                MyScreen()
             }
         }
-
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyScreen() {
+    Scaffold (
+        topBar = {
+            TopAppBar(
+                title = { Text("ヘッダー") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF1976D2),
+                    titleContentColor = Color.White
+                )
+            )
+        },
+        bottomBar = {
+            BottomAppBar (
+                containerColor = Color(0xFF388E3C)
+            ) {
+                Text("フッター",
+                    modifier = Modifier.padding(16.dp),
+                    color = Color.White
+                )
+            }
+        }
+    ) { innerPadding ->
+        Greeting (
+            name = "Android",
+            modifier = Modifier.padding(innerPadding)
+        )
+    }
+}
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
