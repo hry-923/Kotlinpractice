@@ -24,8 +24,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Settings
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 
 
 class MainActivity : ComponentActivity() {
@@ -34,7 +42,20 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             KotlinpracticeTheme {
-                MyScreen()
+                // NavControllerを初期化
+                val navController = rememberNavController()
+                NavHost(navController = navController, startDestination = "main") {
+                    composable("main") {
+                        MyScreen(onNavigateToSettings = {
+                            navController.navigate("settings")
+                        })
+                    }
+                    composable("settings") {
+                        SettingsScreen(onNavigateUp = {
+                            navController.popBackStack()
+                        })
+                    }
+                }
             }
         }
     }
@@ -42,53 +63,58 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyScreen() {
-    Scaffold (
-        topBar = {
-            TopAppBar(
-                title = { Text("ヘッダー") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1976D2),
-                    titleContentColor = Color.White
-                )
+fun MyScreen(onNavigateToSettings: () -> Unit) { // 設定画面へのナビゲーションコールバックを追加
+    Scaffold(topBar = {
+        TopAppBar(
+            title = { Text("ヘッダー") }, colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Color(0xFF1976D2), titleContentColor = Color.White
+            ), actions = { // TopAppBarに設定アイコンボタンを追加
+                IconButton(onClick = onNavigateToSettings) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = "設定画面へ",
+                        tint = Color.White // アイコンの色を白に指定
+                    )
+                }
+            })
+    }, bottomBar = {
+        BottomAppBar(
+            containerColor = Color(0xFF388E3C)
+        ) {
+            Text(
+                "フッター", modifier = Modifier.padding(16.dp), color = Color.White
             )
-        },
-        bottomBar = {
-            BottomAppBar (
-                containerColor = Color(0xFF388E3C)
-            ) {
-                Text("フッター",
-                    modifier = Modifier.padding(16.dp),
-                    color = Color.White
-                )
-            }
         }
-    ) { innerPadding ->
-        Greeting (
-            name = "Android",
+    }) { innerPadding ->
+        Greeting(
             modifier = Modifier.padding(innerPadding)
         )
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
+fun Greeting(modifier: Modifier = Modifier) {
     var message by remember { mutableStateOf("押すなよ") }
-    var output  by remember { mutableStateOf("") }
-    var text    by remember { mutableStateOf("") }
+    var output by remember { mutableStateOf("") }
+    var text by remember { mutableStateOf("") }
 
     var heightText by remember { mutableStateOf("") }
     var weightText by remember { mutableStateOf("") }
     var bmiResult by remember { mutableStateOf("") }
 
-    Column(modifier = modifier.padding(16.dp)) {
+    Column(
+        modifier = modifier
+            .padding(16.dp)
+            .fillMaxSize()
+    ) { // fillMaxSizeを追加してコンテンツが画面全体に広がるように
         Text(text = "こんにちは!", color = Color.Red)
 
         Button(
-            onClick = { Log.d("Button", "onClick")
-                        message = "押すなって言ったやん"
-                        output  = "お前も韓国語を勉強しろ"
-                      },
+            onClick = {
+                Log.d("Button", "onClick")
+                message = "押すなって言ったやん"
+                output = "お前も韓国語を勉強しろ"
+            },
 
             modifier = Modifier.padding(top = 20.dp)
         ) {
@@ -132,12 +158,63 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
                 } else {
                     bmiResult = "正しい数値を入力してください"
                 }
-            },
-            modifier = Modifier.padding(top = 16.dp)
+            }, modifier = Modifier.padding(top = 16.dp)
         ) {
             Text("BMIを計算する")
         }
 
         Text(text = bmiResult, color = Color.Magenta, modifier = Modifier.padding(top = 16.dp))
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingsScreen(onNavigateUp: () -> Unit) { // メイン画面に戻るためのコールバック
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("設定") }, navigationIcon = {
+                    IconButton(onClick = onNavigateUp) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "戻る"
+                        )
+                    }
+                }, colors = TopAppBarDefaults.topAppBarColors( // メイン画面と色を合わせる例
+                    containerColor = Color(0xFF1976D2),
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                )
+            )
+        }) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize() // コンテンツが画面全体に広がるように
+                .padding(16.dp) // 内側のコンテンツにさらにパディング
+        ) {
+            Text("ここに設定項目が表示されます。")
+            // 今後、ここに具体的な設定UI（Switch、TextFieldなど）を追加していきます。
+            // 例:
+            // var notificationsEnabled by remember { mutableStateOf(true) }
+            // Row(verticalAlignment = Alignment.CenterVertically) {
+            //     Text("通知を有効にする")
+            //     Spacer(Modifier.weight(1f))
+            //     Switch(
+            //         checked = notificationsEnabled,
+            //         onCheckedChange = { notificationsEnabled = it }
+            //     )
+            // }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    KotlinpracticeTheme {
+        // Preview用にNavHostは不要なので、直接MyScreenを呼び出すか、
+        // もしSettingsScreenをプレビューしたい場合はSettingsScreenを呼び出す
+        MyScreen(onNavigateToSettings = {})
+// SettingsScreen(onNavigateUp = {}) // SettingsScreenをプレビュー
     }
 }
