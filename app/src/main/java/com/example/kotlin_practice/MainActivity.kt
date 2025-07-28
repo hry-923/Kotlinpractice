@@ -30,6 +30,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -46,12 +47,20 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = "main") {
                     composable("main") {
-                        MyScreen(onNavigateToSettings = {
-                            navController.navigate("settings")
-                        })
+                        MyScreen(
+                            onNavigateToSettings = {
+                            navController.navigate("settings") },
+                            onNavigateToProfile = {
+                        navController.navigate("profile")
+                    })
                     }
                     composable("settings") {
                         SettingsScreen(onNavigateUp = {
+                            navController.popBackStack()
+                        })
+                    }
+                    composable("profile") {
+                        ProfileScreen(onNavigateUp = {
                             navController.popBackStack()
                         })
                     }
@@ -63,29 +72,42 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyScreen(onNavigateToSettings: () -> Unit) { // 設定画面へのナビゲーションコールバックを追加
-    Scaffold(topBar = {
-        TopAppBar(
-            title = { Text("ヘッダー") }, colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color(0xFF1976D2), titleContentColor = Color.White
-            ), actions = { // TopAppBarに設定アイコンボタンを追加
-                IconButton(onClick = onNavigateToSettings) {
-                    Icon(
-                        imageVector = Icons.Filled.Settings,
-                        contentDescription = "設定画面へ",
-                        tint = Color.White // アイコンの色を白に指定
-                    )
+fun MyScreen(
+    onNavigateToSettings: () -> Unit,
+    onNavigateToProfile: () -> Unit
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Top") },
+                actions = {
+                    IconButton(onClick = onNavigateToProfile) {
+                        Icon(
+                            imageVector = Icons.Filled.Person,
+                            contentDescription = "Profileへ",
+                            tint = Color.Black
+                        )
+                    }
+                    IconButton(onClick = onNavigateToSettings) {
+                        Icon(
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = "Settingsへ",
+                            tint = Color.Black
+                        )
+                    }
                 }
-            })
-    }, bottomBar = {
-        BottomAppBar(
-            containerColor = Color(0xFF388E3C)
-        ) {
-            Text(
-                "フッター", modifier = Modifier.padding(16.dp), color = Color.White
             )
+        },
+        bottomBar = {
+            BottomAppBar(
+                containerColor = Color(0xFF388E3C)
+            ) {
+                Text(
+                    "フッター", modifier = Modifier.padding(16.dp), color = Color.White
+                )
+            }
         }
-    }) { innerPadding ->
+    ) { innerPadding ->
         Greeting(
             modifier = Modifier.padding(innerPadding)
         )
@@ -193,17 +215,33 @@ fun SettingsScreen(onNavigateUp: () -> Unit) { // メイン画面に戻るため
                 .padding(16.dp) // 内側のコンテンツにさらにパディング
         ) {
             Text("ここに設定項目が表示されます。")
-            // 今後、ここに具体的な設定UI（Switch、TextFieldなど）を追加していきます。
-            // 例:
-            // var notificationsEnabled by remember { mutableStateOf(true) }
-            // Row(verticalAlignment = Alignment.CenterVertically) {
-            //     Text("通知を有効にする")
-            //     Spacer(Modifier.weight(1f))
-            //     Switch(
-            //         checked = notificationsEnabled,
-            //         onCheckedChange = { notificationsEnabled = it }
-            //     )
-            // }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProfileScreen(onNavigateUp: () -> Unit) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Profile") },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateUp) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "戻る"
+                        )
+                    }
+                }
+            )
+        }) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize() // コンテンツが画面全体に広がるように
+                .padding(16.dp) // 内側のコンテンツにさらにパディング
+        ) {
+            Text("ここにProfileが表示されます。")
         }
     }
 }
@@ -214,7 +252,6 @@ fun DefaultPreview() {
     KotlinpracticeTheme {
         // Preview用にNavHostは不要なので、直接MyScreenを呼び出すか、
         // もしSettingsScreenをプレビューしたい場合はSettingsScreenを呼び出す
-        MyScreen(onNavigateToSettings = {})
-// SettingsScreen(onNavigateUp = {}) // SettingsScreenをプレビュー
+        MyScreen(onNavigateToSettings = {}, onNavigateToProfile = {})// SettingsScreen(onNavigateUp = {}) // SettingsScreenをプレビュー
     }
 }
